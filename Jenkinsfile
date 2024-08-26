@@ -13,7 +13,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Clone the GitHub repository
-                git url: 'https://github.com/SaiDevOpsFaculty/saidemytrend.git', branch: 'main'
+                git url: 'https://github.com/srimani-123/saidemytrend.git', branch: 'main'
             }
         }
         
@@ -29,11 +29,11 @@ pipeline {
         stage('SonarQube Analysis') {
             environment {
                 // Set the SonarQube scanner tool
-                scannerHome = tool 'srimani_sonar_scanner'
+                scannerHome = tool 'srimani-sonar-scanner'
             }
             steps {
                 // Execute SonarQube analysis within the SonarQube environment
-                withSonarQubeEnv('srimani_sonarqubeserver') {
+                withSonarQubeEnv('srimani-sonarqube-server') {
                     sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
