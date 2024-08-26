@@ -29,11 +29,11 @@ pipeline {
         stage('SonarQube Analysis') {
             environment {
                 // Set the SonarQube scanner tool
-                scannerHome = tool 'saidemy-sonar-scanner'
+                scannerHome = tool 'srimani_sonar_scanner'
             }
             steps {
                 // Execute SonarQube analysis within the SonarQube environment
-                withSonarQubeEnv('saidemy-sonarqube-server') {
+                withSonarQubeEnv('srimani_sonarqubeserver') {
                     sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
