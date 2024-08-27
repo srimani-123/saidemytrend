@@ -1,12 +1,14 @@
+def registry = 'https://srimani123.jfrog.io/'
+
 pipeline {
     // Specify the agent to run the pipeline
     agent any
-    
+
     // Set environment variables for the pipeline
     environment {
         PATH = "/opt/maven/bin:$PATH"
     }
-    
+
     // Define the stages of the pipeline
     stages {
         // Stage for building the project
@@ -20,7 +22,7 @@ pipeline {
                 echo "-----Build completed-----"
             }
         }
-        
+
         // Stage for running unit tests
         stage('test') {
             steps {
@@ -32,7 +34,7 @@ pipeline {
                 echo 'Unit test completed'
             }
         }
-        
+
         // Stage for SonarQube analysis
         stage('SonarQube analysis') {
             environment {
@@ -46,5 +48,47 @@ pipeline {
                 }
             }
         }
+
+        // New Stage for Jar Publishing
+        stage("Jar Publish") {
+            steps {
+                script {
+                    echo "----------- Jar Publish Started -----------"
+                    def server = Artifactory.newServer url: "${registry}/artifactory", credentialsId: "artifact-cred"
+                    def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}"
+                    def uploadSpec = """{
+                        "files": [
+                            {
+                                "pattern": "jarstaging/*",
+                                "target": "srimani-libs-release-local/{1}",
+                                "flat": false,
+                                "props": "${properties}",
+                                "exclusions": [ "*.sha1", "*.md5" ]
+                            }
+                        ]
+                    }"""
+                    def buildInfo = server.upload(uploadSpec)
+                    buildInfo.env.collect()
+                    server.publishBuildInfo(buildInfo)
+                    echo "----------- Jar Publish Ended -----------"
+                }
+            }
+        }
+    }
+
+    // Post-build actions
+    post {
+        always {
+            echo 'Cleaning up...'
+            // Add any cleanup steps if necessary
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+            // Optionally send notifications or trigger other actions
+        }
     }
 }
+
