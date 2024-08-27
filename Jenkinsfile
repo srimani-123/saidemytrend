@@ -31,7 +31,7 @@ pipeline {
                 // Run Maven Surefire report
                 sh 'mvn surefire-report:report'
                 // Log message to indicate unit test completion
-                echo 'Unit test completed'
+                echo '-----Unit test completed-----'
             }
         }
 
